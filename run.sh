@@ -11,7 +11,24 @@ trap 'err $LINENO' ERR
 cd ${0%/*}
 docker rm -f wsl2-linux-kernel-docker-build || true
 zcat /proc/config.gz > .config
-echo "CONFIG_BLK_DEV_NBD=y" >> .config
+
+cat <<EOT >> .config
+CONFIG_BLK_DEV_NBD=y
+CONFIG_CC_CAN_LINK=y
+CONFIG_CC_CAN_LINK_STATIC=y
+CONFIG_DMA_SHARED_BUFFER=y
+CONFIG_SYNC_FILE=y
+CONFIG_STAGING=y
+CONFIG_ASHMEM=y
+CONFIG_ANDROID=y
+CONFIG_ANDROID_BINDER_IPC=y
+CONFIG_ANDROID_BINDERFS=y
+CONFIG_ANDROID_BINDER_DEVICES="binder,hwbinder,vndbinder"
+CONFIG_IPV6_ROUTER_PREF=y
+CONFIG_IPV6_ROUTE_INFO=y
+CONFIG_IPV6_MULTIPLE_TABLES=y
+CONFIG_IPV6_SUBTREES=y
+EOT
 rm -f vmlinux || true
 
 docker run -it --rm --name wsl2-linux-kernel-docker-build \
@@ -19,6 +36,7 @@ docker run -it --rm --name wsl2-linux-kernel-docker-build \
 	-v $(pwd)/.config:/root/WSL2-Linux-Kernel/Microsoft/config \
 	wsl2-linux-kernel-docker-build bash -c " \
 		cp Microsoft/config Microsoft/config.1 \
+        && echo make menuconfig KCONFIG_CONFIG=Microsoft/config.1 \
 		&& make -j$(nproc) KCONFIG_CONFIG=Microsoft/config.1 \
 		&& cp -f vmlinux /tmp/build/vmlinux \
 	"

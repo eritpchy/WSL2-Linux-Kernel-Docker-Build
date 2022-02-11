@@ -3,7 +3,7 @@ RUN apt update \
 	&& apt install -y software-properties-common \
 	&& add-apt-repository -y ppa:ubuntu-toolchain-r/test \
 	&& apt update \
-	&& apt install -y gcc-10 make flex bison libssl-dev libelf-dev git bc \
+	&& apt install -y gcc-10 make flex bison libssl-dev libelf-dev git bc libncurses-dev \
 	&& ln -s /usr/bin/gcc-10 /usr/bin/gcc \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/*
